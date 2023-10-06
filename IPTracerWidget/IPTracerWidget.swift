@@ -24,33 +24,33 @@ struct IPTracerWidgetProvider: TimelineProvider {
     func placeholder(in context: Context) -> IPTracerWidgetEntry {
         IPTracerWidgetEntry(date: Date(), ipInfo: nil)
     }
-
+    
     func getSnapshot(in context: Context, completion: @escaping (IPTracerWidgetEntry) -> ()) {
         let entry = IPTracerWidgetEntry(date: Date(), ipInfo: nil)
         completion(entry)
     }
-
+    
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-            var entries: [IPTracerWidgetEntry] = []
-
-            let publicIP = getPublicIPAddress()
-
-            fetchIPInfo(using: publicIP) { result in
-                switch result {
-                case .success(let ipInfo):
-                    let entry = IPTracerWidgetEntry(date: Date(), ipInfo: ipInfo)
-                    entries.append(entry)
-                case .failure(let error):
-                    print("Error fetching IP info: \(error.localizedDescription)")
-                    
-                    let entry = IPTracerWidgetEntry(date: Date(), ipInfo: nil)
-                    entries.append(entry)
-                }
-
-                let timeline = Timeline(entries: entries, policy: .atEnd)
-                completion(timeline)
+        var entries: [IPTracerWidgetEntry] = []
+        
+        let publicIP = getPublicIPAddress()
+        
+        fetchIPInfo(using: publicIP) { result in
+            switch result {
+            case .success(let ipInfo):
+                let entry = IPTracerWidgetEntry(date: Date(), ipInfo: ipInfo)
+                entries.append(entry)
+            case .failure(let error):
+                print("Error fetching IP info: \(error.localizedDescription)")
+                
+                let entry = IPTracerWidgetEntry(date: Date(), ipInfo: nil)
+                entries.append(entry)
             }
+            
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
         }
+    }
 }
 
 struct IPTracerWidgetEntry: TimelineEntry {
@@ -60,7 +60,7 @@ struct IPTracerWidgetEntry: TimelineEntry {
 
 struct IPTracerWidgetEntryView : View {
     var entry: IPTracerWidgetProvider.Entry
-
+    
     var body: some View {
         VStack {
             if let ipInfo = entry.ipInfo {
@@ -75,13 +75,9 @@ struct IPTracerWidgetEntryView : View {
     }
 }
 
-func timelineEntryTapped() {
-        print("Widget tapped")
-    }
-
 struct IPTracerWidget: Widget {
     let kind: String = "IPTracerWidget"
-
+    
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: IPTracerWidgetProvider()) { entry in
             if #available(macOS 14.0, *) {
@@ -102,7 +98,7 @@ struct IPTracerWidget: Widget {
 // Synchronously fetch the public IP address
 func getPublicIPAddress() -> String {
     let url = URL(string: "https://ipinfo.io/ip")!
-
+    
     if let data = try? Data(contentsOf: url),
        let ipAddress = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
         return ipAddress
@@ -117,22 +113,22 @@ func fetchIPInfo(using ipAddress: String, completion: @escaping (Result<IPInfo, 
         completion(.failure(NSError(domain: "AppErrorDomain", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
         return
     }
-
+    
     let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
         if let error = error {
             completion(.failure(error))
             return
         }
-
+        
         guard let data = data else {
             completion(.failure(NSError(domain: "AppErrorDomain", code: 2, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
             return
         }
-
+        
         if let rawResponse = String(data: data, encoding: .utf8) {
             print("Raw API Response:\n\(rawResponse)")
         }
-
+        
         do {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -142,6 +138,6 @@ func fetchIPInfo(using ipAddress: String, completion: @escaping (Result<IPInfo, 
             completion(.failure(error))
         }
     }
-
+    
     task.resume()
 }

@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B447E7FA2AD0845C00921C5F /* IPTracerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E7F92AD0845C00921C5F /* IPTracerApp.swift */; };
-		B447E7FC2AD0845C00921C5F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E7FB2AD0845C00921C5F /* ContentView.swift */; };
+		B447E7FA2AD0845C00921C5F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E7F92AD0845C00921C5F /* AppDelegate.swift */; };
+		B447E7FC2AD0845C00921C5F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E7FB2AD0845C00921C5F /* ViewController.swift */; };
 		B447E7FE2AD0845E00921C5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B447E7FD2AD0845E00921C5F /* Assets.xcassets */; };
 		B447E8012AD0845E00921C5F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B447E8002AD0845E00921C5F /* Preview Assets.xcassets */; };
 		B447E8292AD0872200921C5F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B447E8282AD0872200921C5F /* WidgetKit.framework */; };
@@ -17,6 +17,10 @@
 		B447E8302AD0872200921C5F /* IPTracerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E82F2AD0872200921C5F /* IPTracerWidget.swift */; };
 		B447E8322AD0872300921C5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B447E8312AD0872300921C5F /* Assets.xcassets */; };
 		B447E8372AD0872300921C5F /* IPTracerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B447E8262AD0872200921C5F /* IPTracerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B447E83D2AD0A90200921C5F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E83C2AD0A90200921C5F /* main.swift */; };
+		B447E8402AD0AFD400921C5F /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E83F2AD0AFD400921C5F /* ApiService.swift */; };
+		B447E8422AD0B05F00921C5F /* IPInfoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E8412AD0B05F00921C5F /* IPInfoModel.swift */; };
+		B447E8442AD0B74600921C5F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447E8432AD0B74600921C5F /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,8 +49,8 @@
 
 /* Begin PBXFileReference section */
 		B447E7F62AD0845C00921C5F /* IPTracer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IPTracer.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B447E7F92AD0845C00921C5F /* IPTracerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPTracerApp.swift; sourceTree = "<group>"; };
-		B447E7FB2AD0845C00921C5F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B447E7F92AD0845C00921C5F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B447E7FB2AD0845C00921C5F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B447E7FD2AD0845E00921C5F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B447E8002AD0845E00921C5F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B447E8022AD0845E00921C5F /* IPTracer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IPTracer.entitlements; sourceTree = "<group>"; };
@@ -58,6 +62,11 @@
 		B447E8312AD0872300921C5F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B447E8332AD0872300921C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B447E8342AD0872300921C5F /* IPTracerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IPTracerWidget.entitlements; sourceTree = "<group>"; };
+		B447E83C2AD0A90200921C5F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		B447E83E2AD0AC5A00921C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B447E83F2AD0AFD400921C5F /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
+		B447E8412AD0B05F00921C5F /* IPInfoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPInfoModel.swift; sourceTree = "<group>"; };
+		B447E8432AD0B74600921C5F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,8 +111,13 @@
 		B447E7F82AD0845C00921C5F /* IPTracer */ = {
 			isa = PBXGroup;
 			children = (
-				B447E7F92AD0845C00921C5F /* IPTracerApp.swift */,
-				B447E7FB2AD0845C00921C5F /* ContentView.swift */,
+				B447E83E2AD0AC5A00921C5F /* Info.plist */,
+				B447E8432AD0B74600921C5F /* Utils.swift */,
+				B447E83C2AD0A90200921C5F /* main.swift */,
+				B447E83F2AD0AFD400921C5F /* ApiService.swift */,
+				B447E7F92AD0845C00921C5F /* AppDelegate.swift */,
+				B447E7FB2AD0845C00921C5F /* ViewController.swift */,
+				B447E8412AD0B05F00921C5F /* IPInfoModel.swift */,
 				B447E7FD2AD0845E00921C5F /* Assets.xcassets */,
 				B447E8022AD0845E00921C5F /* IPTracer.entitlements */,
 				B447E7FF2AD0845E00921C5F /* Preview Content */,
@@ -241,8 +255,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B447E7FC2AD0845C00921C5F /* ContentView.swift in Sources */,
-				B447E7FA2AD0845C00921C5F /* IPTracerApp.swift in Sources */,
+				B447E7FC2AD0845C00921C5F /* ViewController.swift in Sources */,
+				B447E7FA2AD0845C00921C5F /* AppDelegate.swift in Sources */,
+				B447E8422AD0B05F00921C5F /* IPInfoModel.swift in Sources */,
+				B447E8402AD0AFD400921C5F /* ApiService.swift in Sources */,
+				B447E83D2AD0A90200921C5F /* main.swift in Sources */,
+				B447E8442AD0B74600921C5F /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,6 +417,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IPTracer/Info.plist;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -427,6 +447,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IPTracer/Info.plist;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
