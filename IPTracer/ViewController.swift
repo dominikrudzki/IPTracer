@@ -8,17 +8,38 @@
 import Cocoa
 
 class ViewController: NSViewController {
+    // MARK: - Properties
     
-    let apiService = ApiService.initialize
+    private let apiService = ApiService.initialize
     
-    var textField: NSTextField!
-    var ipInfoLabel: NSTextField!
-    var lastFetch: Date!
-    var button: NSButton!
-    var progressIndicator: NSProgressIndicator!
+    private var ipInfo: IPInfo?
+    private var lastFetch: Date?
     
-    var ipInfo: IPInfo?
+    // MARK: - UI Elements
     
+    private lazy var button: NSButton = {
+        let button = NSButton(title: "Fetch IP Info", target: self, action: #selector(fetchButtonClicked(_:)))
+        button.frame = NSRect(x: 0, y: 0, width: 200, height: 30)
+        return button
+    }()
+    
+    private lazy var ipInfoLabel: NSTextField = {
+        let label = NSTextField(labelWithString: "Public IP: ...\nIP Location: ...\nLast Fetch: ...")
+        label.frame = NSRect(x: 10, y: 25, width: 200, height: 60)
+        label.alignment = .left
+        label.lineBreakMode = .byWordWrapping
+        return label
+    }()
+    
+    private lazy var progressIndicator: NSProgressIndicator = {
+        let indicator = NSProgressIndicator(frame: NSRect(x: 175, y: 75, width: 15, height: 15))
+        indicator.style = .spinning
+        indicator.isIndeterminate = true
+        indicator.isHidden = true
+        return indicator
+    }()
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,82 +50,84 @@ class ViewController: NSViewController {
         self.view = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 100))
     }
     
-    override var representedObject: Any? {
-        didSet {}
-    }
+    // MARK: - UI Setup
     
-    func setupUI() {
-        button = NSButton(title: "Fetch IP Info", target: self, action: #selector(buttonClicked(_:)))
-        button.frame = NSRect(x: 0, y: 0, width: 200, height: 30)
-        
-        ipInfoLabel = NSTextField(labelWithString: "Public IP: ...\nIP Location: ...\nLast Fetch: ...")
-        ipInfoLabel.frame = NSRect(x: 10, y: 25, width: 200, height: 60)
-        ipInfoLabel.alignment = .left
-        ipInfoLabel.lineBreakMode = .byWordWrapping
-        
-        progressIndicator = NSProgressIndicator(frame: NSRect(x: 175, y: 75, width: 15, height: 15))
-        progressIndicator.style = .spinning
-        progressIndicator.isIndeterminate = true
-        progressIndicator.isHidden = true
-        
+    private func setupUI() {
         self.view.addSubview(button)
         self.view.addSubview(ipInfoLabel)
         self.view.addSubview(progressIndicator)
     }
     
-    func fetchData(completion: @escaping (Result<IPInfo, Error>) -> Void) {
+    // MARK: - Data Fetching
+    
+    private func fetchData(completion: @escaping (Result<IPInfo, Error>) -> Void) {
         progressIndicator.isHidden = false
         progressIndicator.startAnimation(nil)
         
-        let workItem = DispatchWorkItem {
-            self.progressIndicator.isHidden = true
-            self.progressIndicator.stopAnimation(nil)
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: workItem)
-        
-        apiService.getPublicIPAddress() { publicIP in
+        apiService.getPublicIPAddress() { [weak self] publicIP in
+            guard let self = self else { return }
+            
             switch publicIP {
             case .success(let ipInfo):
                 self.apiService.fetchIPInfo(using: ipInfo) { result in
-                    
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let ipInfo):
-                            self.lastFetch = Date()
-                            completion(.success(ipInfo))
-                        case .failure(let error):
-                            completion(.failure(error))
-                        }
-                    }
+                    self.handleFetchResult(result, completion: completion)
                 }
             case .failure(let error):
-                workItem.cancel()
-                
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                self.handleFetchError(error, completion: completion)
             }
         }
     }
     
+    private func handleFetchResult(_ result: Result<IPInfo, Error>, completion: @escaping (Result<IPInfo, Error>) -> Void) {
+        DispatchQueue.main.async {
+            self.progressIndicator.isHidden = true
+            self.progressIndicator.stopAnimation(nil)
+            
+            switch result {
+            case .success(let ipInfo):
+                self.lastFetch = Date()
+                completion(.success(ipInfo))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
     
-    @objc func buttonClicked(_ sender: NSButton) {
+    private func handleFetchError(_ error: Error, completion: @escaping (Result<IPInfo, Error>) -> Void) {
+        DispatchQueue.main.async {
+            self.progressIndicator.isHidden = true
+            self.progressIndicator.stopAnimation(nil)
+            completion(.failure(error))
+        }
+    }
+    
+    // MARK: - Button Action
+    
+    @objc private func fetchButtonClicked(_ sender: NSButton) {
+        button.isEnabled = false
+        
         fetchData { [weak self] result in
             DispatchQueue.main.async {
-                switch result {
-                case .success(let ipInfo):
-                    self?.ipInfo = ipInfo
-                    self?.updateUIWithIPInfo(ipInfo)
-                case .failure(_):
-                    self?.ipInfo = nil
-                    self?.updateUIWithErrorMessage("Error fetching IP info")
+                self?.button.isEnabled = true
+                self?.handleFetchResult(result) { [weak self] result in
+                    switch result {
+                    case .success(let ipInfo):
+                        self?.ipInfo = ipInfo
+                        self?.updateUIWithIPInfo(ipInfo)
+                    case .failure(_):
+                        self?.ipInfo = nil
+                        self?.updateUIWithErrorMessage("Error fetching IP info")
+                    }
                 }
             }
         }
     }
     
-    func updateUIWithIPInfo(_ ipInfo: IPInfo) {
+    // MARK: - UI Updates
+    
+    private func updateUIWithIPInfo(_ ipInfo: IPInfo) {
+        guard let lastFetch = lastFetch else { return }
+        
         ipInfoLabel.stringValue = """
             Public IP: \(ipInfo.ip)
             IP Location: \(ipInfo.countryName.prefix(14))
@@ -113,9 +136,8 @@ class ViewController: NSViewController {
         ipInfoLabel.textColor = .green
     }
     
-    func updateUIWithErrorMessage(_ errorMessage: String) {
+    private func updateUIWithErrorMessage(_ errorMessage: String) {
         ipInfoLabel.stringValue = errorMessage
         ipInfoLabel.textColor = .red
     }
-    
 }
