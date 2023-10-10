@@ -9,17 +9,22 @@ import Cocoa
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    private var statusItem: NSStatusItem!
+    private var statusItem: NSStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private var popover: NSPopover!
     private var outsideClickMonitor: Any?
+    private var settingsMenu: NSMenu = {
+        let menu = NSMenu()
+        menu.addItem(withTitle: "Quit IPTracer", action: #selector(quit(_:)), keyEquivalent: "")
+        return menu
+    }()
     
+    @available(macOS, deprecated: 10.14)
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let statusButton = statusItem.button {
             statusButton.image = NSImage(systemSymbolName: "flowchart", accessibilityDescription: "flow")
             statusButton.action = #selector(togglePopover)
+            statusButton.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
         
         self.popover = NSPopover()
@@ -42,12 +47,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
     }
     
+    @available(macOS, deprecated: 10.14)
     @objc func togglePopover() {
-        if let button = statusItem.button {
-            if popover.isShown {
-                self.popover.performClose(nil)
+        if let event = NSApp.currentEvent {
+            if event.type == NSEvent.EventType.rightMouseUp {
+                statusItem.popUpMenu(settingsMenu)
             } else {
-                popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+                if let button = statusItem.button {
+                    if popover.isShown {
+                        self.popover.performClose(nil)
+                    } else {
+                        popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+                    }
+                }
             }
         }
     }
@@ -60,5 +72,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         return true
+    }
+    
+    @objc func quit(_ sender: AnyObject?) {
+        NSApplication.shared.terminate(self)
     }
 }
