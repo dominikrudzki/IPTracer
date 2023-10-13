@@ -8,9 +8,12 @@
 import Foundation
 
 class Utils {
-    static func formatDate(date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm:ss"
-        return dateFormatter.string(from: date)
+    static func formatTimeElapsed(_ timeElapsed: TimeInterval) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.year, .month, .weekOfMonth, .day, .hour, .minute, .second]
+        formatter.maximumUnitCount = 1
+
+        return formatter.string(from: timeElapsed) ?? ""
     }
 }

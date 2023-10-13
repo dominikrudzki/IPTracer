@@ -11,9 +11,9 @@ class ViewController: NSViewController {
     // MARK: - Properties
     
     private let apiService = ApiService.initialize
-    
     private var ipInfo: IPInfo?
     private var lastFetch: Date?
+    private var timer: Timer?
     
     // MARK: - UI Elements
     
@@ -24,7 +24,7 @@ class ViewController: NSViewController {
     }()
     
     private lazy var ipInfoLabel: NSTextField = {
-        let label = NSTextField(labelWithString: "Public IP: ...\nIP Location: ...\nLast Fetch: ...")
+        let label = NSTextField(labelWithString: "Public IP: ...\nIP Location: ...\nUpdate: ...")
         label.frame = NSRect(x: 10, y: 25, width: 200, height: 60)
         label.alignment = .left
         label.lineBreakMode = .byWordWrapping
@@ -44,6 +44,7 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        startTimer()
     }
     
     override func loadView() {
@@ -125,19 +126,62 @@ class ViewController: NSViewController {
     
     // MARK: - UI Updates
     
+    private func updateTimeLabelText(with timeString: String, isSuccessful: Bool) {
+        ipInfoLabel.stringValue = """
+                Public IP: \(ipInfo?.ip ?? "...")
+                IP Location: \(ipInfo?.countryName.prefix(14) ?? "...")
+                Update: \(timeString) ago
+                """
+        ipInfoLabel.textColor = isSuccessful ? .green : .red
+    }
+    
     private func updateUIWithIPInfo(_ ipInfo: IPInfo) {
         guard let lastFetch = lastFetch else { return }
         
-        ipInfoLabel.stringValue = """
-            Public IP: \(ipInfo.ip)
-            IP Location: \(ipInfo.countryName.prefix(14))
-            Last Fetch: \(Utils.formatDate(date: lastFetch))
-            """
-        ipInfoLabel.textColor = .green
+        let timeElapsed = Date().timeIntervalSince(lastFetch)
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
+        formatter.maximumUnitCount = 1
+        
+        guard let timeString = formatter.string(from: timeElapsed) else {
+            return
+        }
+        
+        updateTimeLabelText(with: timeString, isSuccessful: true)
     }
     
     private func updateUIWithErrorMessage(_ errorMessage: String) {
         ipInfoLabel.stringValue = errorMessage
         ipInfoLabel.textColor = .red
+    }
+    
+    // MARK: - Timer Action
+    
+    private func startTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateFetchTime), userInfo: nil, repeats: true)
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    // MARK: - Timer Action
+    
+    @objc private func updateFetchTime() {
+        guard let lastFetch = lastFetch else { return }
+        
+        let timeElapsed = Date().timeIntervalSince(lastFetch)
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
+        formatter.maximumUnitCount = 1
+        
+        guard let timeString = formatter.string(from: timeElapsed) else {
+            return
+        }
+        
+        updateTimeLabelText(with: timeString, isSuccessful: true)
     }
 }
